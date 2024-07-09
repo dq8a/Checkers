@@ -1,0 +1,337 @@
+<html>
+  <head>
+    <title>
+      Checkers
+    </title>
+    <style>
+        body{
+            background-color:#3333ff;
+        }
+        .black{
+            background-color: black;
+            
+
+        }
+        .white{
+            background-color:white;
+            
+        }
+        .selected{
+            background:blue;
+        }
+        .green::before{
+            content: "";
+            background-color: rgba(0,255,0,.5);
+            position:absolute;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+        }
+        .redCircle {
+            width: 80%;
+            height: 80%;
+            background: red;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+          }
+        .blackCircle {
+            width: 80%;
+            height: 80%;
+            background: black;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .row {
+            max-width:800px;
+        }
+        #board{
+            background-color:rgb(10, 97, 97);
+            margin-left: auto;
+            margin-right: auto;
+            max-width: 800px; 
+            border: 10px solid rgb(10, 97, 97);       
+        }
+        span{
+            text-align: center;
+            position: relative;
+            width: 12.5%;
+            height: 100px;
+            display:inline-block;
+        }
+    </style>
+  </head>
+  <body>
+    <h1>
+        Checkers
+    </h1>
+    <div id="board">
+    </div>
+  <script>
+    
+
+    var board = document.getElementById("board");
+    
+    var turn = "blackCircle";
+
+    for (var i = 0;i<8;i++){
+        var row = createRow();
+        var columnCount = 0;
+        for (var j = 0; j<4;j++){
+            var white = createTile("white");
+            var black = createTile("black");
+            if (i%2==0){
+                row.append(white);
+                white.id = "row"+i+"white" + j + "_" + columnCount;
+                columnCount++;
+                row.append(black);
+                black.id = "row"+i+"black" + j + "_" + columnCount;
+                columnCount++;
+            }
+            else {
+                row.append(black);
+                black.id = "row"+i+"black" + j + "_" + columnCount;
+                columnCount++;
+                row.append(white);
+                white.id = "row"+i+"white" + j + "_" + columnCount;
+                columnCount++;
+            }  
+        }
+        board.append(row);
+    } 
+    var rows = document.getElementsByClassName("row");  
+    for (var i = 0; i<3; i++){
+        var tiles = rows[i].getElementsByClassName("white");
+        for (j=0; j<tiles.length;j++){
+            tiles[j].append(createPiece("redCircle"))
+        }
+    }
+    for (var i = 5; i<8; i++){
+        var tiles = rows[i].getElementsByClassName("white");
+        for (j=0; j<tiles.length;j++){
+            tiles[j].append(createPiece("blackCircle"))
+        }
+    }
+    function createRow(){
+        var row = document.createElement("div");
+        row.className="row";
+        return row;
+    }
+    function createTile(color){
+        var tile = document.createElement("span");
+        tile.className=color;
+        tile.addEventListener("click",function(e){
+            console.log("click2");
+            if(e.target.className == "black"){
+                return;
+            }
+            //if(e.target.className == "white" && e.target.hasChildNodes()){
+            //    return; 
+            //}
+            if(document.getElementsByClassName("selected").length>0){
+                console.log(document.getElementsByClassName("selected")[0].children.length);
+                console.log(document.getElementsByClassName("selected")[0].children);
+                //if(e.target.children.length > 0){
+                    //return;
+                //}
+                var htmlSelected = document.getElementsByClassName("selected")[0];
+                var tileValidPositions = getValidMovements(htmlSelected.id, true);
+                if (!tileValidPositions.includes(e.target.id)){
+                    return;
+                }
+                //Executes movement
+                e.target.append(document.getElementsByClassName("selected")[0].firstElementChild);
+                document.getElementsByClassName("selected")[0].className = document.getElementsByClassName("selected")[0].className.split("selected").join("");
+                removeGreen();
+                if (turn =="blackCircle"){
+                    turn = "redCircle";
+                }
+                else {
+                    turn = "blackCircle";
+                }
+            }
+        })
+        return tile;
+    }
+    function createPiece(color){
+        var piece = document.createElement("div");
+        piece.className=color;
+        piece.addEventListener("click",function(e){
+            e.stopPropagation();
+            if (turn == e.target.className){
+                console.log("click");
+                var x = document.getElementsByClassName("selected");
+                if (x.length > 0){
+                    x[0].className = x[0].className.split(" selected").join("");
+                    removeGreen();
+                }
+                e.target.parentElement.className = e.target.parentElement.className+" selected";
+                var tileValidPositions = getValidMovements(e.target.parentElement.id, true);
+                for (var i = 0; i<tileValidPositions.length; i++){
+                    var tile = document.getElementById(tileValidPositions[i]);
+                    tile.className = tile.className+" green";
+                }
+            }
+        });
+        return piece;
+    }
+    function getValidMovements(selected, checkOccupy){
+        var row = parseInt(selected.substring(3,4), 10);
+        var column = parseInt(selected.substring(9,10), 10);
+        console.log("row", row);
+        console.log("column", column);
+        var validPositions = [];
+        for (var i = 0; i<8; i++){
+            var columnCount = 0;
+            
+            for (var j = 0; j<4;j++){
+                console.log(i, j);
+                var checkTileWhite = "row"+i+"white" + j + "_";
+                var checkTileBlack = "row"+i+"black" + j + "_";
+                if (i%2==0){
+                    checkTileWhite += columnCount;
+                    columnCount++;
+                    checkTileBlack += columnCount;
+                    columnCount++;
+                }
+                else {
+                    checkTileBlack += columnCount;
+                    columnCount++;
+                    checkTileWhite += columnCount;
+                    columnCount++;
+                }  
+                var tileCheck = document.getElementById(checkTileWhite);
+                if (tileCheck.hasChildNodes() && checkOccupy){
+                    var takeMove = getTakes(selected, tileCheck)
+                    if (takeMove != ""){
+                        validPositions.push(takeMove);
+                    }
+                    continue;
+                }
+                if (i%2==0 && (j == column || j == column+1) && (i == row-1) && turn == "blackCircle"){
+                    validPositions.push(checkTileWhite);
+                    console.log("validPositions");
+                }
+                else if (i%2!=0 && (j == column || j == column-1) && (i == row-1) && turn == "blackCircle" ){
+                    validPositions.push(checkTileWhite);
+                    console.log("validPositions");
+                }
+                else if (i%2!=0 && (j == column || j == column-1) && (i == row+1) && turn == "redCircle"){
+                    validPositions.push(checkTileWhite);
+                    console.log("validPositions");
+                }
+                else if (i%2==0 && (j == column || j == column+1) && (i == row+1) && turn == "redCircle"){
+                    validPositions.push(checkTileWhite);
+                    console.log("validPositions");
+                }
+            }
+        }
+        return validPositions;
+    }
+    /* function checkDiagonal(selected){
+        var tileCheck = document.getElementById(selected); 
+        if (tileCheck.hasChildNodes() && checkOccupy){
+           // continue;
+        }
+        if (i%2==0 && (j == column || j == column+1) && (i == row-1) && turn == "blackCircle"){
+            validPositions.push(checkTileWhite);
+            console.log("validPositions");
+        }
+        else if (i%2!=0 && (j == column || j == column-1) && (i == row-1) && turn == "blackCircle" ){
+            validPositions.push(checkTileWhite);
+            console.log("validPositions");
+        }
+        else if (i%2!=0 && (j == column || j == column-1) && (i == row+1) && turn == "redCircle"){
+            validPositions.push(checkTileWhite);
+            console.log("validPositions");
+        }
+        else if (i%2==0 && (j == column || j == column+1) && (i == row+1) && turn == "redCircle"){
+            validPositions.push(checkTileWhite);
+            console.log("validPositions");
+        }
+    } */
+
+    function getTakes(selected, whiteTile){
+        var whiteTileId = whiteTile.id;
+        var tileColumn = parseInt(whiteTileId.split("_")[1], 10);
+        var selectedColumn = parseInt(selected.split("_")[1], 10);
+        var selectedRow = parseInt(selected.substring(3,4), 10);
+        var tileRow = parseInt(whiteTileId.substring(3,4), 10);
+        var targetColumn = 0;
+        var targetRow = 0;
+        var targetColumnId = 0;
+        var targetId = "";
+        if (whiteTile.firstElementChild.className == turn){
+            return "";
+        }
+        else if (turn == "redCircle" && tileRow != selectedRow+1){
+            return "";
+        }
+        else if (turn == "blackCircle" && tileRow != selectedRow-1){
+            return "";
+        }
+        else if (tileColumn != selectedColumn+1 && tileColumn != selectedColumn-1){
+            return "";
+        }
+        else if (tileColumn > selectedColumn){
+            targetColumn = tileColumn+1;
+
+        }
+        else {
+            targetColumn = tileColumn-1;
+        }
+        if (turn == "redCircle"){
+            targetRow = tileRow+1;
+        }
+        else {
+            targetRow = tileRow-1;
+        }
+        if (targetColumn == 6 || targetColumn == 7){
+            targetColumnId = 3;
+        }
+        else if (targetColumn == 4 || targetColumn == 5){
+            targetColumnId = 2;
+        }
+        else if (targetColumn == 2 || targetColumn == 3){
+            targetColumnId = 1;
+        }
+        else {
+            targetColumnId = 0;
+        }
+        targetId = "row"+targetRow+"white"+targetColumnId+"_"+targetColumn;
+        var targetHtml = document.getElementById(targetId);
+        if (!targetHtml){
+            return "";
+        }
+        if (targetHtml.hasChildNodes()){
+            return "";
+        }
+        return targetId;
+    }
+
+    function removeGreen(){
+        var greenTiles = document.getElementsByClassName("green");
+        console.log("removeGreen");
+        console.log(greenTiles);
+        console.log(greenTiles.length);
+        var greensTotal = greenTiles.length;
+        for (var i = 0; i<greensTotal; i++)
+        {
+            var greenTile = document.getElementsByClassName("green")[0];
+            console.log('greenTile');
+            console.log(greenTile);
+            console.log(greenTile.className);
+            console.log(greenTile.className.split(" green").join(""));
+
+            greenTile.className = greenTile.className.split(" green").join("");
+        }
+    }
+  </script>      
+  </body>
+</html>
