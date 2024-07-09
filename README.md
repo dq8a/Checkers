@@ -1,0 +1,2 @@
+# Checkers
+Javascript based Checkers
