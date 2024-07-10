@@ -141,14 +141,19 @@
                     //return;
                 //}
                 var htmlSelected = document.getElementsByClassName("selected")[0];
-                var tileValidPositions = getValidMovements(htmlSelected.id, true);
+                var tileValidPositions = getValidMovements(htmlSelected.id, true, false);
                 if (!tileValidPositions.includes(e.target.id)){
                     return;
                 }
                 //Executes movement
+                var getTakes = getValidMovements(htmlSelected.id, true, true);
+                if (getTakes.includes(e.target.id)){
+                    alert("Take");
+                }
                 e.target.append(document.getElementsByClassName("selected")[0].firstElementChild);
                 document.getElementsByClassName("selected")[0].className = document.getElementsByClassName("selected")[0].className.split("selected").join("");
                 removeGreen();
+                
                 if (turn =="blackCircle"){
                     turn = "redCircle";
                 }
@@ -172,7 +177,7 @@
                     removeGreen();
                 }
                 e.target.parentElement.className = e.target.parentElement.className+" selected";
-                var tileValidPositions = getValidMovements(e.target.parentElement.id, true);
+                var tileValidPositions = getValidMovements(e.target.parentElement.id, true, false);
                 for (var i = 0; i<tileValidPositions.length; i++){
                     var tile = document.getElementById(tileValidPositions[i]);
                     tile.className = tile.className+" green";
@@ -181,7 +186,7 @@
         });
         return piece;
     }
-    function getValidMovements(selected, checkOccupy){
+    function getValidMovements(selected, checkOccupy, checkTakes){
         var row = parseInt(selected.substring(3,4), 10);
         var column = parseInt(selected.substring(9,10), 10);
         console.log("row", row);
@@ -214,21 +219,23 @@
                     }
                     continue;
                 }
-                if (i%2==0 && (j == column || j == column+1) && (i == row-1) && turn == "blackCircle"){
-                    validPositions.push(checkTileWhite);
-                    console.log("validPositions");
-                }
-                else if (i%2!=0 && (j == column || j == column-1) && (i == row-1) && turn == "blackCircle" ){
-                    validPositions.push(checkTileWhite);
-                    console.log("validPositions");
-                }
-                else if (i%2!=0 && (j == column || j == column-1) && (i == row+1) && turn == "redCircle"){
-                    validPositions.push(checkTileWhite);
-                    console.log("validPositions");
-                }
-                else if (i%2==0 && (j == column || j == column+1) && (i == row+1) && turn == "redCircle"){
-                    validPositions.push(checkTileWhite);
-                    console.log("validPositions");
+                if(checkTakes == false){
+                    if (i%2==0 && (j == column || j == column+1) && (i == row-1) && turn == "blackCircle"){
+                        validPositions.push(checkTileWhite);
+                        console.log("validPositions");
+                    }
+                    else if (i%2!=0 && (j == column || j == column-1) && (i == row-1) && turn == "blackCircle" ){
+                        validPositions.push(checkTileWhite);
+                        console.log("validPositions");
+                    }
+                    else if (i%2!=0 && (j == column || j == column-1) && (i == row+1) && turn == "redCircle"){
+                        validPositions.push(checkTileWhite);
+                        console.log("validPositions");
+                    }
+                    else if (i%2==0 && (j == column || j == column+1) && (i == row+1) && turn == "redCircle"){
+                        validPositions.push(checkTileWhite);
+                        console.log("validPositions");
+                    }
                 }
             }
         }
