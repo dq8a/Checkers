@@ -147,17 +147,28 @@
                 }
                 //Executes movement
                 var getTakes = getValidMovements(htmlSelected.id, true, true);
+                var keepTurn = false;
                 if (getTakes.includes(e.target.id)){
-                    alert("Take");
+                    executeTake(htmlSelected.id, e.target);
+                    keepTurn = true;
                 }
                 e.target.append(document.getElementsByClassName("selected")[0].firstElementChild);
                 document.getElementsByClassName("selected")[0].className = document.getElementsByClassName("selected")[0].className.split("selected").join("");
                 removeGreen();
                 
-                if (turn =="blackCircle"){
+                /*if (turn == "blackCircle" && keepTurn){
+                    turn == "blackCircle";
+                }
+                else if (turn == "redCircle" && keepTurn){
+                    turn == "redCircle";
+                }
+
+                else 
+                */
+                if (turn =="blackCircle" && !keepTurn){
                     turn = "redCircle";
                 }
-                else {
+                else if (!keepTurn){
                     turn = "blackCircle";
                 }
             }
@@ -213,7 +224,7 @@
                 }  
                 var tileCheck = document.getElementById(checkTileWhite);
                 if (tileCheck.hasChildNodes() && checkOccupy){
-                    var takeMove = getTakes(selected, tileCheck)
+                    var takeMove = getTakes(selected, tileCheck);
                     if (takeMove != ""){
                         validPositions.push(takeMove);
                     }
@@ -337,6 +348,42 @@
             console.log(greenTile.className.split(" green").join(""));
 
             greenTile.className = greenTile.className.split(" green").join("");
+        }
+    }
+
+    function executeTake(selected, targetTile){
+        var row = parseInt(selected.substring(3,4), 10);
+        var column = parseInt(selected.substring(9,10), 10);
+        console.log("row", row);
+        console.log("column", column);
+        var validPositions = [];
+        for (var i = 0; i<8; i++){
+            var columnCount = 0;
+            
+            for (var j = 0; j<4;j++){
+                console.log(i, j);
+                var checkTileWhite = "row"+i+"white" + j + "_";
+                var checkTileBlack = "row"+i+"black" + j + "_";
+                if (i%2==0){
+                    checkTileWhite += columnCount;
+                    columnCount++;
+                    checkTileBlack += columnCount;
+                    columnCount++;
+                }
+                else {
+                    checkTileBlack += columnCount;
+                    columnCount++;
+                    checkTileWhite += columnCount;
+                    columnCount++;
+                }  
+                var tileCheck = document.getElementById(checkTileWhite);
+                if (tileCheck.hasChildNodes()){
+                    var takeMove = getTakes(selected, tileCheck);
+                    if (takeMove == targetTile.id){
+                        tileCheck.firstChild.remove();
+                    }
+                }
+            }
         }
     }
   </script>      
