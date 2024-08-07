@@ -47,6 +47,44 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            color: white;
+        }
+        .crown div {
+            box-sizing: border-box;
+            position: absolute;
+            display: block;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50%;
+            height: 30%;
+            border: 2px solid;
+            border-top-color: transparent;
+            border-bottom-right-radius: 3px;
+            border-bottom-left-radius: 3px;
+            padding-top: 4px;
+            text-align: center;
+        }
+        .crown div::after,
+        .crown div::before {
+            content: "";
+            display: block;
+            position: absolute;
+            box-sizing: border-box;
+            width: 47%;
+            height: 61%;
+            border-bottom: 2px solid;
+            border-left: 2px solid;
+            transform: rotate(-45deg);
+            top: -4px;
+        }
+        .crown div::before {
+            border-top-left-radius: 2px;
+            left: -1px
+        }
+        .crown div::after {
+            border-bottom-right-radius: 2px;
+            right: -1px
         }
         .row {
             max-width:800px;
@@ -68,6 +106,15 @@
     </style>
   </head>
   <body>
+    <span class="tile">
+        <div class = "redCircle crown">
+            <div>
+            </div>
+        </div>  
+    </span>
+    
+    <div class="crown">
+    </div>
     <h1>
         Checkers
     </h1>
@@ -152,9 +199,14 @@
                     executeTake(htmlSelected.id, e.target);
                     keepTurn = true;
                 }
-                e.target.append(document.getElementsByClassName("selected")[0].firstElementChild);
+                var targetPiece = htmlSelected.firstElementChild;
+                e.target.append(targetPiece);
                 document.getElementsByClassName("selected")[0].className = document.getElementsByClassName("selected")[0].className.split("selected").join("");
                 removeGreen();
+                var targetRow = parseInt(e.target.id.substring(3,4), 10);
+                if (targetRow == 0 || targetRow == 7){
+                    targetPiece.className +=" crown";
+                }
                 
                 /*if (turn == "blackCircle" && keepTurn){
                     turn == "blackCircle";
@@ -177,10 +229,12 @@
     }
     function createPiece(color){
         var piece = document.createElement("div");
+        var div = document.createElement("div");
+        piece.append(div);
         piece.className=color;
         piece.addEventListener("click",function(e){
             e.stopPropagation();
-            if (turn == e.target.className){
+            if (e.target.className.includes(turn)){
                 console.log("click");
                 var x = document.getElementsByClassName("selected");
                 if (x.length > 0){
@@ -200,6 +254,8 @@
     function getValidMovements(selected, checkOccupy, checkTakes){
         var row = parseInt(selected.substring(3,4), 10);
         var column = parseInt(selected.substring(9,10), 10);
+        var selectedHtml = document.getElementById(selected);
+        var pieceHtml = selectedHtml.firstElementChild;
         console.log("row", row);
         console.log("column", column);
         var validPositions = [];
@@ -247,6 +303,12 @@
                         validPositions.push(checkTileWhite);
                         console.log("validPositions");
                     }
+                    else if (i%2==0 && (j == column || j == column+1) && (i == row-1 || i == row+1) && pieceHtml.className.includes("crown")){
+                        validPositions.push(checkTileWhite);    
+                    }
+                    else if (i%2!=0 && (j == column || j == column-1) && (i == row-1 || i == row+1) && pieceHtml.className.includes("crown")){
+                        validPositions.push(checkTileWhite);    
+                    }
                 }
             }
         }
@@ -285,29 +347,47 @@
         var targetRow = 0;
         var targetColumnId = 0;
         var targetId = "";
+        var selectedHtml = document.getElementById(selected);
+        var pieceHtml = selectedHtml.firstElementChild;
+        var isCrowned = pieceHtml.className.includes("crown");
+        var crownDirection = "up";
         if (whiteTile.firstElementChild.className == turn){
             return "";
         }
         else if (turn == "redCircle" && tileRow != selectedRow+1){
-            return "";
+            if(isCrowned && tileRow == selectedRow - 1)
+            {
+                crownDirection = "up";
+            }
+            else
+            {
+                return "";
+            }
         }
         else if (turn == "blackCircle" && tileRow != selectedRow-1){
+            if(isCrowned && tileRow == selectedRow + 1)
+            {
+                crownDirection = "down";
+            }
+            else
+            {
+                return "";
+            }
+        }
+        if (tileColumn != selectedColumn+1 && tileColumn != selectedColumn-1){
             return "";
         }
-        else if (tileColumn != selectedColumn+1 && tileColumn != selectedColumn-1){
-            return "";
-        }
-        else if (tileColumn > selectedColumn){
+        if (tileColumn > selectedColumn){
             targetColumn = tileColumn+1;
 
         }
         else {
             targetColumn = tileColumn-1;
         }
-        if (turn == "redCircle"){
+        if ((turn == "redCircle" && !isCrowned) || (isCrowned && crownDirection == "down")){
             targetRow = tileRow+1;
         }
-        else {
+        if((turn == "blackCircle" && !isCrowned) || (isCrowned && crownDirection == "up")){
             targetRow = tileRow-1;
         }
         if (targetColumn == 6 || targetColumn == 7){
