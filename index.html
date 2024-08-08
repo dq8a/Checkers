@@ -1,5 +1,7 @@
 <html>
   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
       Checkers
     </title>
@@ -174,25 +176,15 @@
         var tile = document.createElement("span");
         tile.className=color;
         tile.addEventListener("click",function(e){
-            console.log("click2");
             if(e.target.className == "black"){
                 return;
             }
-            //if(e.target.className == "white" && e.target.hasChildNodes()){
-            //    return; 
-            //}
             if(document.getElementsByClassName("selected").length>0){
-                console.log(document.getElementsByClassName("selected")[0].children.length);
-                console.log(document.getElementsByClassName("selected")[0].children);
-                //if(e.target.children.length > 0){
-                    //return;
-                //}
                 var htmlSelected = document.getElementsByClassName("selected")[0];
                 var tileValidPositions = getValidMovements(htmlSelected.id, true, false);
                 if (!tileValidPositions.includes(e.target.id)){
                     return;
                 }
-                //Executes movement
                 var getTakes = getValidMovements(htmlSelected.id, true, true);
                 var keepTurn = false;
                 if (getTakes.includes(e.target.id)){
@@ -207,16 +199,6 @@
                 if (targetRow == 0 || targetRow == 7){
                     targetPiece.className +=" crown";
                 }
-                
-                /*if (turn == "blackCircle" && keepTurn){
-                    turn == "blackCircle";
-                }
-                else if (turn == "redCircle" && keepTurn){
-                    turn == "redCircle";
-                }
-
-                else 
-                */
                 if (turn =="blackCircle" && !keepTurn){
                     turn = "redCircle";
                 }
@@ -261,7 +243,6 @@
         var validPositions = [];
         for (var i = 0; i<8; i++){
             var columnCount = 0;
-            
             for (var j = 0; j<4;j++){
                 console.log(i, j);
                 var checkTileWhite = "row"+i+"white" + j + "_";
@@ -314,29 +295,6 @@
         }
         return validPositions;
     }
-    /* function checkDiagonal(selected){
-        var tileCheck = document.getElementById(selected); 
-        if (tileCheck.hasChildNodes() && checkOccupy){
-           // continue;
-        }
-        if (i%2==0 && (j == column || j == column+1) && (i == row-1) && turn == "blackCircle"){
-            validPositions.push(checkTileWhite);
-            console.log("validPositions");
-        }
-        else if (i%2!=0 && (j == column || j == column-1) && (i == row-1) && turn == "blackCircle" ){
-            validPositions.push(checkTileWhite);
-            console.log("validPositions");
-        }
-        else if (i%2!=0 && (j == column || j == column-1) && (i == row+1) && turn == "redCircle"){
-            validPositions.push(checkTileWhite);
-            console.log("validPositions");
-        }
-        else if (i%2==0 && (j == column || j == column+1) && (i == row+1) && turn == "redCircle"){
-            validPositions.push(checkTileWhite);
-            console.log("validPositions");
-        }
-    } */
-
     function getTakes(selected, whiteTile){
         var whiteTileId = whiteTile.id;
         var tileColumn = parseInt(whiteTileId.split("_")[1], 10);
@@ -351,7 +309,7 @@
         var pieceHtml = selectedHtml.firstElementChild;
         var isCrowned = pieceHtml.className.includes("crown");
         var crownDirection = "up";
-        if (whiteTile.firstElementChild.className == turn){
+        if (whiteTile.firstElementChild.className.includes(turn)){
             return "";
         }
         else if (turn == "redCircle" && tileRow != selectedRow+1){
@@ -415,18 +373,10 @@
 
     function removeGreen(){
         var greenTiles = document.getElementsByClassName("green");
-        console.log("removeGreen");
-        console.log(greenTiles);
-        console.log(greenTiles.length);
         var greensTotal = greenTiles.length;
         for (var i = 0; i<greensTotal; i++)
         {
             var greenTile = document.getElementsByClassName("green")[0];
-            console.log('greenTile');
-            console.log(greenTile);
-            console.log(greenTile.className);
-            console.log(greenTile.className.split(" green").join(""));
-
             greenTile.className = greenTile.className.split(" green").join("");
         }
     }
@@ -434,8 +384,6 @@
     function executeTake(selected, targetTile){
         var row = parseInt(selected.substring(3,4), 10);
         var column = parseInt(selected.substring(9,10), 10);
-        console.log("row", row);
-        console.log("column", column);
         var validPositions = [];
         for (var i = 0; i<8; i++){
             var columnCount = 0;
