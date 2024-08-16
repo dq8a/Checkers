@@ -1,5 +1,7 @@
 <html>
   <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>
       Checkers
     </title>
@@ -28,7 +30,9 @@
             width:100%;
             height:100%;
         }
-        .redCircle {
+        .redCircle,
+        .redCircleDisplay
+        {
             width: 80%;
             height: 80%;
             background: red;
@@ -107,7 +111,7 @@
   </head>
   <body>
     <span class="tile">
-        <div class = "redCircle crown">
+        <div class = "redCircleDisplay crown">
             <div>
             </div>
         </div>  
@@ -197,6 +201,7 @@
                 if (targetRow == 0 || targetRow == 7){
                     targetPiece.className +=" crown";
                 }
+                checkWin();
                 if (turn =="blackCircle" && !keepTurn){
                     turn = "redCircle";
                 }
@@ -236,8 +241,6 @@
         var column = parseInt(selected.substring(9,10), 10);
         var selectedHtml = document.getElementById(selected);
         var pieceHtml = selectedHtml.firstElementChild;
-        console.log("row", row);
-        console.log("column", column);
         var validPositions = [];
         for (var i = 0; i<8; i++){
             var columnCount = 0;
@@ -268,19 +271,15 @@
                 if(checkTakes == false){
                     if (i%2==0 && (j == column || j == column+1) && (i == row-1) && turn == "blackCircle"){
                         validPositions.push(checkTileWhite);
-                        console.log("validPositions");
                     }
                     else if (i%2!=0 && (j == column || j == column-1) && (i == row-1) && turn == "blackCircle" ){
                         validPositions.push(checkTileWhite);
-                        console.log("validPositions");
                     }
                     else if (i%2!=0 && (j == column || j == column-1) && (i == row+1) && turn == "redCircle"){
                         validPositions.push(checkTileWhite);
-                        console.log("validPositions");
                     }
                     else if (i%2==0 && (j == column || j == column+1) && (i == row+1) && turn == "redCircle"){
                         validPositions.push(checkTileWhite);
-                        console.log("validPositions");
                     }
                     else if (i%2==0 && (j == column || j == column+1) && (i == row-1 || i == row+1) && pieceHtml.className.includes("crown")){
                         validPositions.push(checkTileWhite);    
@@ -387,7 +386,6 @@
             var columnCount = 0;
             
             for (var j = 0; j<4;j++){
-                console.log(i, j);
                 var checkTileWhite = "row"+i+"white" + j + "_";
                 var checkTileBlack = "row"+i+"black" + j + "_";
                 if (i%2==0){
@@ -410,6 +408,18 @@
                     }
                 }
             }
+        }
+    }
+    function checkWin(){
+        var checkOppositeTurn = turn=="redCircle" ? "blackCircle" : "redCircle"; 
+        var turnColor = turn=="redCircle" ? "Red" : "Black";
+        var checkBoard = document.getElementsByClassName(checkOppositeTurn);
+        console.log("Pieces left = " + checkBoard.length);
+        if (checkBoard.length==0){
+            setTimeout(function() {
+                alert(turnColor + " Wins!");
+            }, 0);
+            
         }
     }
   </script>      
