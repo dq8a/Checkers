@@ -306,6 +306,9 @@
         var pieceHtml = selectedHtml.firstElementChild;
         var isCrowned = pieceHtml.className.includes("crown");
         var crownDirection = "up";
+        if (tileRow == selectedRow + 1){
+            crownDirection = "down";
+        }
         if (whiteTile.firstElementChild.className.includes(turn)){
             return "";
         }
