@@ -122,51 +122,65 @@
     <h1>
         Checkers
     </h1>
-    <div id="board">
-    </div>
+    <button onclick="createBoard()">
+        Play Again
+    </button>
   <script>
-    
-
-    var board = document.getElementById("board");
-    
     var turn = "blackCircle";
+window.onload = function(){
+    createBoard();
+};
 
-    for (var i = 0;i<8;i++){
-        var row = createRow();
-        var columnCount = 0;
-        for (var j = 0; j<4;j++){
-            var white = createTile("white");
-            var black = createTile("black");
-            if (i%2==0){
-                row.append(white);
-                white.id = "row"+i+"white" + j + "_" + columnCount;
-                columnCount++;
-                row.append(black);
-                black.id = "row"+i+"black" + j + "_" + columnCount;
-                columnCount++;
+    function createBoard(){
+        turn = "blackCircle";
+        console.log("createBoard");
+        var existingBoard = document.getElementById("board");
+        if (existingBoard)
+        {
+            existingBoard.remove();
+        }
+        var board = document.createElement("div");
+        board.id = "board";
+        
+        document.body.appendChild(board);
+
+        for (var i = 0;i<8;i++){
+            var row = createRow();
+            var columnCount = 0;
+            for (var j = 0; j<4;j++){
+                var white = createTile("white");
+                var black = createTile("black");
+                if (i%2==0){
+                    row.append(white);
+                    white.id = "row"+i+"white" + j + "_" + columnCount;
+                    columnCount++;
+                    row.append(black);
+                    black.id = "row"+i+"black" + j + "_" + columnCount;
+                    columnCount++;
+                }
+                else {
+                    row.append(black);
+                    black.id = "row"+i+"black" + j + "_" + columnCount;
+                    columnCount++;
+                    row.append(white);
+                    white.id = "row"+i+"white" + j + "_" + columnCount;
+                    columnCount++;
+                }  
             }
-            else {
-                row.append(black);
-                black.id = "row"+i+"black" + j + "_" + columnCount;
-                columnCount++;
-                row.append(white);
-                white.id = "row"+i+"white" + j + "_" + columnCount;
-                columnCount++;
-            }  
+            board.append(row);
+        } 
+        var rows = document.getElementsByClassName("row");  
+        for (var i = 0; i<3; i++){
+            var tiles = rows[i].getElementsByClassName("white");
+            for (j=0; j<tiles.length;j++){
+                tiles[j].append(createPiece("redCircle"))
+            }
         }
-        board.append(row);
-    } 
-    var rows = document.getElementsByClassName("row");  
-    for (var i = 0; i<3; i++){
-        var tiles = rows[i].getElementsByClassName("white");
-        for (j=0; j<tiles.length;j++){
-            tiles[j].append(createPiece("redCircle"))
-        }
-    }
-    for (var i = 5; i<8; i++){
-        var tiles = rows[i].getElementsByClassName("white");
-        for (j=0; j<tiles.length;j++){
-            tiles[j].append(createPiece("blackCircle"))
+        for (var i = 5; i<8; i++){
+            var tiles = rows[i].getElementsByClassName("white");
+            for (j=0; j<tiles.length;j++){
+                tiles[j].append(createPiece("blackCircle"))
+            }
         }
     }
     function createRow(){
@@ -183,7 +197,8 @@
             }
             if(document.getElementsByClassName("selected").length>0){
                 var htmlSelected = document.getElementsByClassName("selected")[0];
-                var tileValidPositions = getValidMovements(htmlSelected.id, true, false);
+                var anyTakes = hasTakes();
+                var tileValidPositions = getValidMovements(htmlSelected.id, true, anyTakes);
                 if (!tileValidPositions.includes(e.target.id)){
                     return;
                 }
@@ -227,7 +242,9 @@
                     removeGreen();
                 }
                 e.target.parentElement.className = e.target.parentElement.className+" selected";
-                var tileValidPositions = getValidMovements(e.target.parentElement.id, true, false);
+                var anyTakes = hasTakes();
+
+                var tileValidPositions = getValidMovements(e.target.parentElement.id, true, anyTakes);
                 for (var i = 0; i<tileValidPositions.length; i++){
                     var tile = document.getElementById(tileValidPositions[i]);
                     tile.className = tile.className+" green";
@@ -370,7 +387,17 @@
         }
         return targetId;
     }
-
+    function hasTakes(){
+        var pieces = document.getElementsByClassName(turn);
+        for (var i = 0; i<pieces.length; i++){
+            var piece = pieces[i];
+            var movements = getValidMovements(piece.parentElement.id, true, true);
+            if (movements.length > 0){
+                return true;
+            }
+        }
+        return false;
+    }
     function removeGreen(){
         var greenTiles = document.getElementsByClassName("green");
         var greensTotal = greenTiles.length;
