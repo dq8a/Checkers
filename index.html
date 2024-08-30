@@ -106,6 +106,7 @@
             width: 12.5%;
             height: 100px;
             display:inline-block;
+            max-height: calc(100vw * 12.5 / 100);
         }
         .tile{
             transition: left 100ms ease;
@@ -115,6 +116,9 @@
             position: absolute;
             right: 50px;
             margin-top: -50px;
+        }
+        h1{
+            margin: 15px;
         }
     </style>
   </head>
@@ -129,7 +133,7 @@
     <div class="crown">
     </div>
     <h1>
-        Checkers
+        CHECKERS
     </h1>
     <button onclick="createBoard()">
         Play Again
