@@ -107,6 +107,15 @@
             height: 100px;
             display:inline-block;
         }
+        .tile{
+            transition: left 100ms ease;
+        }
+        button{
+            margin: 15px;
+            position: absolute;
+            right: 50px;
+            margin-top: -50px;
+        }
     </style>
   </head>
   <body>
@@ -234,24 +243,32 @@ window.onload = function(){
         piece.className=color;
         piece.addEventListener("click",function(e){
             e.stopPropagation();
-            if (e.target.className.includes(turn)){
-                console.log("click");
-                var x = document.getElementsByClassName("selected");
-                if (x.length > 0){
-                    x[0].className = x[0].className.split(" selected").join("");
-                    removeGreen();
-                }
-                e.target.parentElement.className = e.target.parentElement.className+" selected";
-                var anyTakes = hasTakes();
-
-                var tileValidPositions = getValidMovements(e.target.parentElement.id, true, anyTakes);
-                for (var i = 0; i<tileValidPositions.length; i++){
-                    var tile = document.getElementById(tileValidPositions[i]);
-                    tile.className = tile.className+" green";
-                }
-            }
+            handlePieceClick(e.target);
+        });
+        div.addEventListener("click", function(e){
+            e.stopPropagation();
+            handlePieceClick(e.target.parentElement);
         });
         return piece;
+    }
+    function handlePieceClick(target)
+    {
+        if (target.className.includes(turn)){
+            console.log("click");
+            var x = document.getElementsByClassName("selected");
+            if (x.length > 0){
+                x[0].className = x[0].className.split(" selected").join("");
+                removeGreen();
+            }
+            target.parentElement.className = target.parentElement.className+" selected";
+            var anyTakes = hasTakes();
+
+            var tileValidPositions = getValidMovements(target.parentElement.id, true, anyTakes);
+            for (var i = 0; i<tileValidPositions.length; i++){
+                var tile = document.getElementById(tileValidPositions[i]);
+                tile.className = tile.className+" green";
+            }
+        }
     }
     function getValidMovements(selected, checkOccupy, checkTakes){
         var row = parseInt(selected.substring(3,4), 10);
